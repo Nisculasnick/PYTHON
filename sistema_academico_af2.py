@@ -2,6 +2,8 @@ import json
 arquivo_estudantes="estudantes.json"
 arquivo_professores="professores.json"
 arquivo_disciplinas="disciplinas.json"
+arquivo_turmas="turmas.json"
+arquivo_matriculas="matriculas.json"
 #funções para menu -----------------------------------------
 def menu_principal():
         print('''
@@ -25,6 +27,7 @@ def menu_secundário(tipo):
 
         return int(input('Informe a opção desejada: '))
 
+#funções para estudantes ----------------------------------
 def incluir_estudantes(lista_estudantes):
     lista_estudantes = ler_arquivo(arquivo_estudantes)
     while True:
@@ -102,6 +105,7 @@ def excluir_estudantes(lista_estudantes):
 
 #funções para professores ---------------------------------
 def incluir_professores(lista_professores):
+        lista_professores=ler_arquivo(arquivo_professores)
         code=int(input('Digite o código: '))
         nome=str(input('Digite o nome: ')).strip().title()
         cpf=str(input('Digite o CPF: '))
@@ -161,6 +165,7 @@ def excluir_professores(lista_professores):
 
 #funções para disciplinas ---------------------------------
 def incluir_disciplinas(lista_disciplinas):
+        lista_disciplinas=ler_arquivo(arquivo_disciplinas)
         code=int(input('Digite o código: '))
         nome=str(input('Digite o nome: ')).strip().title()
         if nome and code:
@@ -203,18 +208,222 @@ def atualizar_diciplinas(lista_disciplinas):
 
 def excluir_disciplinas(lista_disciplinas):
         lista_disciplinas=ler_arquivo(arquivo_disciplinas)
-        código_para_excluir=int(input('Qual o código?: '))
+        código_para_excluir=int(input('\nQual o código?: \n'))
         disciplina_para_ser_removido=None
         for dicionario_disciplina in lista_disciplinas:
                 if dicionario_disciplina['código']==código_para_excluir:
                         disciplina_para_ser_removido=dicionario_disciplina
                         break
         if disciplina_para_ser_removido is None:
-                print(f'Disciplina com o código {código_para_excluir} não encontrada!')
+                print(f'\nDisciplina com o código {código_para_excluir} não encontrada!\n')
         else:
                 lista_disciplinas.remove(disciplina_para_ser_removido)
                 print('\nDisciplina removida com sucesso!\n')
                 salvar_arquivo(lista_disciplinas, arquivo_disciplinas)
+
+#funções para turmas --------------------------------------
+
+def incluir_turmas(lista_turmas, lista_professores, lista_disciplinas):
+        lista_turmas=ler_arquivo(arquivo_turmas)
+        lista_disciplinas=ler_arquivo(arquivo_disciplinas)
+        lista_professores=ler_arquivo(arquivo_professores)
+        code_turma=int(input('Digite o código da turma: '))
+        code_professores=int(input('Digite o código do professor: '))
+        code_disciplina=int(input('Digite o código da disciplina: '))
+        professor_encontrado=False
+        for professor in lista_professores:
+               if professor["código"]==code_professores:
+                professor_encontrado=True
+                break
+        disciplina_encontrada=False
+        for disciplina in lista_disciplinas:
+               if disciplina["código"]==code_disciplina:
+                        disciplina_encontrada=True
+                        break
+        if professor_encontrado and disciplina_encontrada:
+               nova_turma={'código': code_turma, 'professor': code_professores, 'disciplina': code_disciplina}
+               lista_turmas.append(nova_turma)
+               salvar_arquivo(lista_turmas, arquivo_turmas)
+               print('\nTurma cadastrada com sucesso!\n')
+        else:
+                if not professor_encontrado:
+                       print(f'Professor com o código {code_professores} não encontrado!')
+                if not disciplina_encontrada:
+                       print(f'Código da turma {code_disciplina} não encontrado!')
+
+def listar_turmas(lista_turmas):
+        lista_turmas=ler_arquivo(arquivo_turmas)
+        if lista_turmas:
+            print('\nLista de Turmas:\n')
+            for turma in lista_turmas:
+                print(f'Código da turma: {turma['código']}')
+                print(f'Código do professor: {turma['professor']}')
+                print(f'Código da disciplina: {turma['disciplina']}')
+        else:
+                print('\n Lista vazia, nenhuma disciplina encontrada\n')
+        input('\nPressione ENTER para continuar\n')
+
+def atualizar_turmas(lista_turmas):
+        lista_turmas=ler_arquivo(arquivo_turmas)
+        código_para_editar=int(input('\nQual o código da Turma que deseja editar? '))
+        turma_encontrada=None
+        for turma in lista_turmas:
+              if turma['código']==código_para_editar:
+                     turma_encontrada=turma
+                     break
+        if turma_encontrada is None:
+              print(f'\nTurma com código {código_para_editar} não encontrada\n')
+        else:
+              turma_encontrada['código']=int(input('Digite novo código (turma): '))
+              turma_encontrada['professor']=int(input('Digite novo código (professor): '))
+              turma_encontrada['disciplna']=int(input('Digite novo código (disciplina): '))
+              salvar_arquivo(lista_turmas, arquivo_turmas)
+
+def excluir_turmas(lista_turmas):
+        lista_turmas=ler_arquivo(arquivo_turmas)
+        código_para_excluir=int(input('Qual o código? '))
+        turma_para_ser_removida=None
+        for dicionario_turmas in lista_turmas:
+               if dicionario_turmas['código']==código_para_excluir:
+                      turma_para_ser_removida=dicionario_turmas
+                      break
+        if turma_para_ser_removida is None:
+               print(f'\nTurma com o código {código_para_excluir} não encontrada\n')
+        else:
+               lista_turmas.remove(turma_para_ser_removida)
+               print('\nTurma removida com sucesso!\n')
+               salvar_arquivo(lista_turmas)
+
+#funções para matrículas ----------------------------------
+
+def incluir_matriculas(lista_matriculas, lista_estudantes, lista_turmas):
+    lista_matriculas=ler_arquivo(arquivo_matriculas)
+    lista_estudantes=ler_arquivo(lista_estudantes)
+    lista_turmas=ler_arquivo(arquivo_turmas)
+    code_turma = int(input('Digite o código da turma para a matrícula: '))
+    code_aluno = int(input('Digite o código do estudante para a matrícula: '))
+    turma_encontrada = None
+    for turma in lista_turmas:
+        if turma['código'] == code_turma:
+            turma_encontrada = turma
+            break
+    aluno_encontrado = None
+    for aluno in lista_estudantes:
+        if aluno['código'] == code_aluno:
+            aluno_encontrado = aluno
+            break
+    if aluno_encontrado and turma_encontrada:
+        matricula_existente = False
+        for matricula in lista_matriculas:
+            if matricula['turma'] == code_turma and matricula['estudante'] == code_aluno:
+                matricula_existente = True
+                break
+        if matricula_existente:
+            print('\nEste estudante já está matriculado nesta turma!\n')
+        else:
+            nova_matricula = {'turma': code_turma, 'estudante': code_aluno}
+            lista_matriculas.append(nova_matricula)
+            salvar_arquivo(lista_matriculas, "matriculas.json") 
+            print('\nMatrícula realizada com sucesso!\n')
+    else:
+        if not turma_encontrada:
+            print(f'\nTurma com o código {code_turma} não encontrada!\n')
+        if not aluno_encontrado:
+            print(f'\nEstudante com o código {code_aluno} não encontrado!\n') 
+
+def listar_matriculas(lista_matriculas, lista_estudantes, lista_turmas):
+        lista_matriculas=ler_arquivo(arquivo_matriculas)
+        lista_estudantes=ler_arquivo(lista_estudantes)
+        lista_turmas=ler_arquivo(arquivo_turmas)
+        if lista_matriculas:
+                print('\nLista de Matrículas:')
+        for matricula in lista_matriculas:
+                codigo_turma = matricula['turma']
+                codigo_estudante = matricula['estudante']
+
+                nome_turma = "Turma não encontrada"
+                for turma in lista_turmas:
+                        if turma['código'] == codigo_turma:
+                                nome_turma = turma['código'] 
+                                break
+
+                nome_estudante = "Estudante não encontrado"
+                for estudante in lista_estudantes:
+                        if estudante['código'] == codigo_estudante:
+                                nome_estudante = estudante['nome']
+                                break
+
+                print(f"  Turma: {codigo_turma} (Código), Estudante: {codigo_estudante} ({nome_estudante})")
+        else:
+                print('\nNão há matrículas cadastradas.\n')
+
+        input('Pressione ENTER para continuar')
+
+def atualizar_matriculas(lista_matriculas, lista_estudantes, lista_turmas):
+    lista_estudantes=ler_arquivo(arquivo_estudantes)
+    lista_turmas=ler_arquivo(arquivo_turmas)
+    codigo_turma_antigo = int(input('Digite o código da turma da matrícula que deseja atualizar: '))
+    codigo_aluno_antigo = int(input('Digite o código do estudante da matrícula que deseja atualizar: '))
+    matricula_encontrada = None
+    for matricula in lista_matriculas:
+        if matricula['turma'] == codigo_turma_antigo and matricula['estudante'] == codigo_aluno_antigo:
+            matricula_encontrada = matricula
+            break
+    if matricula_encontrada:
+        print('\nMatrícula encontrada. O que deseja atualizar?')
+        print('[1] Turma')
+        print('[2] Estudante')
+        opcao = int(input('Informe a opção: '))
+        if opcao == 1:
+            novo_codigo_turma = int(input('Digite o novo código da turma: '))
+            turma_existe = any(turma['código'] == novo_codigo_turma for turma in lista_turmas)
+            if turma_existe:
+                matricula_encontrada['turma'] = novo_codigo_turma
+                salvar_arquivo(lista_matriculas, "matriculas.json")
+                print('\nTurma da matrícula atualizada com sucesso!\n')
+            else:
+                print(f'\nTurma com código {novo_codigo_turma} não encontrada.\n')
+        elif opcao == 2:
+            novo_codigo_aluno = int(input('Digite o novo código do estudante: '))
+            aluno_existe = any(aluno['código'] == novo_codigo_aluno for aluno in lista_estudantes)
+            if aluno_existe:
+                matricula_encontrada['estudante'] = novo_codigo_aluno
+                salvar_arquivo(lista_matriculas, "matriculas.json")
+                print('\nEstudante da matrícula atualizado com sucesso!\n')
+            else:
+                print(f'\nEstudante com código {novo_codigo_aluno} não encontrado.\n')
+        else:
+            print('\nOpção inválida.\n')
+    else:
+        print('\nMatrícula não encontrada.\n')      
+
+def excluir_turmas(lista_turmas, lista_matriculas):
+    lista_turmas=ler_arquivo(lista_turmas)
+    lista_matriculas=ler_arquivo(arquivo_matriculas)
+    codigo_para_excluir = int(input('Digite o código da turma que deseja excluir: '))
+    turma_encontrada = None
+    indice_turma_remover = -1
+
+    for indice, turma in enumerate(lista_turmas):
+        if turma['código'] == codigo_para_excluir:
+            turma_encontrada = turma
+            indice_turma_remover = indice
+            break
+
+    if turma_encontrada:
+        matriculas_para_remover = [
+            matricula for matricula in lista_matriculas if matricula['turma'] == codigo_para_excluir
+        ]
+        for matricula in matriculas_para_remover:
+            lista_matriculas.remove(matricula)
+
+        del lista_turmas[indice_turma_remover]
+        salvar_arquivo(lista_turmas, "turmas.json")
+        salvar_arquivo(lista_matriculas, "matriculas.json")
+        print(f'\nTurma com código {codigo_para_excluir} e suas matrículas associadas foram excluídas com sucesso!\n')
+    else:
+        print(f'\nTurma com código {codigo_para_excluir} não encontrada.\n')
+       
 # funções para arquivos em json----------------------------            
 def salvar_arquivo(lista, nome_arquivo):
     with open(nome_arquivo, "w", encoding='utf-8') as arquivo:
@@ -230,6 +439,8 @@ def ler_arquivo(nome_arquivo):
 lista_estudantes=ler_arquivo(arquivo_estudantes)
 lista_professores=ler_arquivo(arquivo_professores)
 lista_disciplinas=ler_arquivo(arquivo_disciplinas)
+lista_turmas=ler_arquivo(arquivo_turmas)
+lista_matriculas=ler_arquivo(arquivo_matriculas)
 while True:
         option=menu_principal()
         if option==9:
@@ -283,5 +494,39 @@ while True:
                                 excluir_disciplinas(lista_disciplinas)
                         else:
                                 print('Opção INVÁLIDA')
+        elif option == 4:
+                while True:
+                        action=menu_secundário('Turmas') 
+                        if action == 9:
+                                print('Voltando ao MENU PRINCIPAL')
+                                break 
+                        if action == 1:
+                               incluir_turmas(lista_turmas, lista_professores, lista_disciplinas)
+                        if action == 2:
+                               listar_turmas(lista_turmas)
+                        if action == 3:
+                               atualizar_turmas(lista_turmas)
+                        if action == 4:
+                               excluir_turmas(lista_turmas)
+                        else:
+                                print('Opção INVÁLIDA')         
+        elif option == 5:
+               while True:
+                        action=menu_secundário('Matrículas') 
+                        if action == 9:
+                                print('Voltando ao MENU PRINCIPAL')
+                                break 
+                        elif action == 1:
+                                incluir_matriculas(lista_matriculas, lista_estudantes, lista_turmas)
+                        elif action == 2:
+                                listar_matriculas(lista_matriculas, lista_estudantes, lista_turmas)
+                        elif action == 3:
+                                atualizar_matriculas(lista_matriculas, lista_estudantes, lista_turmas)
+                        elif action == 4:
+                                excluir_turmas(lista_turmas, lista_matriculas)
+                        else:
+                               print('opção INVÁLIDA')
+
+
         else:
                print('EM DESENVOLVIMENTO')
