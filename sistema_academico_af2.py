@@ -292,13 +292,13 @@ def excluir_turmas(lista_turmas):
         else:
                lista_turmas.remove(turma_para_ser_removida)
                print('\nTurma removida com sucesso!\n')
-               salvar_arquivo(lista_turmas)
+               salvar_arquivo(lista_turmas, arquivo_turmas)
 
 #funções para matrículas ----------------------------------
 
 def incluir_matriculas(lista_matriculas, lista_estudantes, lista_turmas):
     lista_matriculas=ler_arquivo(arquivo_matriculas)
-    lista_estudantes=ler_arquivo(lista_estudantes)
+    lista_estudantes=ler_arquivo(arquivo_estudantes)
     lista_turmas=ler_arquivo(arquivo_turmas)
     code_turma = int(input('Digite o código da turma para a matrícula: '))
     code_aluno = int(input('Digite o código do estudante para a matrícula: '))
@@ -333,7 +333,7 @@ def incluir_matriculas(lista_matriculas, lista_estudantes, lista_turmas):
 
 def listar_matriculas(lista_matriculas, lista_estudantes, lista_turmas):
         lista_matriculas=ler_arquivo(arquivo_matriculas)
-        lista_estudantes=ler_arquivo(lista_estudantes)
+        lista_estudantes=ler_arquivo(arquivo_estudantes)
         lista_turmas=ler_arquivo(arquivo_turmas)
         if lista_matriculas:
                 print('\nLista de Matrículas:')
@@ -397,8 +397,8 @@ def atualizar_matriculas(lista_matriculas, lista_estudantes, lista_turmas):
     else:
         print('\nMatrícula não encontrada.\n')      
 
-def excluir_turmas(lista_turmas, lista_matriculas):
-    lista_turmas=ler_arquivo(lista_turmas)
+def excluir_matriculas(lista_turmas, lista_matriculas):
+    lista_turmas=ler_arquivo(arquivo_turmas)
     lista_matriculas=ler_arquivo(arquivo_matriculas)
     codigo_para_excluir = int(input('Digite o código da turma que deseja excluir: '))
     turma_encontrada = None
@@ -500,13 +500,13 @@ while True:
                         if action == 9:
                                 print('Voltando ao MENU PRINCIPAL')
                                 break 
-                        if action == 1:
+                        elif action == 1:
                                incluir_turmas(lista_turmas, lista_professores, lista_disciplinas)
-                        if action == 2:
+                        elif action == 2:
                                listar_turmas(lista_turmas)
-                        if action == 3:
+                        elif action == 3:
                                atualizar_turmas(lista_turmas)
-                        if action == 4:
+                        elif action == 4:
                                excluir_turmas(lista_turmas)
                         else:
                                 print('Opção INVÁLIDA')         
@@ -523,7 +523,7 @@ while True:
                         elif action == 3:
                                 atualizar_matriculas(lista_matriculas, lista_estudantes, lista_turmas)
                         elif action == 4:
-                                excluir_turmas(lista_turmas, lista_matriculas)
+                                excluir_matriculas(lista_turmas, lista_matriculas)
                         else:
                                print('opção INVÁLIDA')
 
